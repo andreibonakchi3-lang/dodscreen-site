@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DoD Screen — Defense contract alerts before the market moves</title>
+<meta name="description" content="An AI system that monitors USASpending.gov 4x daily, cross-references 100+ publicly traded defense companies, and delivers investment-grade contract analysis to your inbox.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --green:#00C805; --green-soft:#E7F8EC; --green-ink:#00A804;
+    --red:#E23A3A; --red-soft:#FDECEC;
+    --ink:#1e1e1e; --black:#000; --grey:#6b6b6b; --grey-lt:#9b9b9b; --grey-xlt:#c4c4c4;
+    --line:#efefef; --line-lt:#f0f0f0; --tier2:#b86b00;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+       background:#fff;color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1040px;margin:0 auto;padding:0 24px}
+
+  /* nav */
+  nav{border-bottom:1px solid var(--line)}
+  .nav-inner{display:flex;align-items:center;justify-content:space-between;height:64px}
+  .logo{font-weight:800;font-size:17px;letter-spacing:-.02em;color:var(--black)}
+  .logo span{color:var(--green-ink)}
+  .nav-cta{font-size:14px;font-weight:600;color:#fff;background:var(--black);
+           padding:9px 18px;border-radius:999px;text-decoration:none}
+
+  /* hero */
+  .hero{padding:96px 0 72px;text-align:center}
+  .hero h1{font-size:56px;line-height:1.08;font-weight:800;letter-spacing:-.03em;color:var(--black);
+           max-width:760px;margin:0 auto}
+  .hero p{font-size:19px;color:var(--grey);max-width:640px;margin:24px auto 0}
+  .cta{display:inline-block;margin-top:36px;background:var(--green);color:#fff;font-size:16px;
+       font-weight:700;padding:15px 34px;border-radius:999px;text-decoration:none;
+       transition:background .15s ease}
+  .cta:hover{background:var(--green-ink)}
+  .hero .fine{margin-top:14px;font-size:12px;color:var(--grey-xlt)}
+
+  /* sections */
+  section{padding:72px 0}
+  .kicker{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+          color:var(--green-ink);text-align:center}
+  h2{font-size:32px;font-weight:800;letter-spacing:-.02em;color:var(--black);
+     text-align:center;margin-top:8px}
+
+  /* how it works */
+  .steps{display:flex;gap:20px;margin-top:48px}
+  .step{flex:1;border:1px solid var(--line);border-radius:16px;padding:28px}
+  .step .num{width:32px;height:32px;border-radius:999px;background:var(--green-soft);
+             color:var(--green-ink);font-weight:700;font-size:14px;display:flex;
+             align-items:center;justify-content:center}
+  .step h3{font-size:17px;font-weight:700;color:var(--black);margin:16px 0 6px}
+  .step p{font-size:14px;color:var(--grey)}
+
+  /* demo email card — mirrors the live digest format */
+  .demo-stage{background:#fafafa;border:1px solid var(--line);border-radius:24px;
+              padding:56px 24px;margin-top:48px;display:flex;justify-content:center}
+  .card{font-size:14px;background:#fff;border:1px solid var(--line);border-radius:16px;
+        padding:24px;max-width:560px;width:100%}
+  .card-head{display:flex;justify-content:space-between;align-items:flex-start}
+  .tk{font-size:26px;font-weight:700;color:var(--black);letter-spacing:-.02em}
+  .co{font-size:13px;color:#8a8a8a;margin-top:4px}
+  .px{font-size:15px;font-weight:600;color:var(--ink);margin-top:8px}
+  .px b{color:var(--green);font-weight:600}
+  .amt-label{font-size:11px;color:var(--grey-lt);letter-spacing:.08em;text-align:right}
+  .amt{font-size:22px;font-weight:700;color:var(--black);text-align:right;margin-top:3px}
+  .pill{display:inline-block;background:var(--green-soft);color:var(--green-ink);font-size:10px;
+        font-weight:700;letter-spacing:.06em;padding:4px 10px;border-radius:999px;margin-top:10px;float:right}
+  .meta{font-size:12px;color:var(--grey-lt);margin-top:16px}
+  .tier{display:inline-block;background:rgba(184,107,0,.08);color:var(--tier2);font-size:12px;
+        font-weight:600;padding:6px 13px;border-radius:999px}
+  .rule{border-top:1px solid var(--line-lt);margin-top:18px;padding-top:18px}
+  .sig-row{display:flex;justify-content:space-between;font-size:12px}
+  .sig-row .l{color:var(--grey-lt)} .sig-row .r{color:var(--ink);font-weight:600}
+  .bar{background:#f0f0f0;border-radius:999px;height:6px;margin-top:7px}
+  .bar i{display:block;background:var(--green);width:60%;height:6px;border-radius:999px}
+  .thesis{margin-top:18px;font-size:14px;color:var(--ink);line-height:1.7}
+  table.signals{width:100%;border-collapse:collapse;margin-top:12px}
+  table.signals td{padding:11px 0;font-size:13px;border-bottom:1px solid #f4f4f4}
+  table.signals tr:last-child td{border-bottom:none}
+  table.signals td.l{color:var(--grey-lt)}
+  table.signals td.r{text-align:right;font-weight:500;color:var(--ink)}
+  table.signals td.r.good{color:var(--green-ink)}
+  .watch .l{font-size:12px;color:var(--grey-lt)}
+  .watch p{margin-top:5px;font-size:13px;color:var(--ink);line-height:1.6}
+  .demo-caption{text-align:center;font-size:12px;color:var(--grey-xlt);margin-top:16px}
+
+  /* waitlist */
+  .waitlist{text-align:center}
+  .waitlist p.sub{font-size:16px;color:var(--grey);max-width:480px;margin:14px auto 0}
+  form{display:flex;gap:10px;justify-content:center;margin-top:32px;flex-wrap:wrap}
+  input[type=email]{font-family:inherit;font-size:15px;padding:14px 18px;border:1px solid #ddd;
+        border-radius:999px;width:340px;max-width:100%;outline:none;color:var(--ink)}
+  input[type=email]:focus{border-color:var(--green)}
+  button{font-family:inherit;font-size:15px;font-weight:700;color:#fff;background:var(--green);
+         border:none;padding:14px 30px;border-radius:999px;cursor:pointer;transition:background .15s ease}
+  button:hover{background:var(--green-ink)}
+
+  footer{border-top:1px solid var(--line);padding:36px 0 48px;margin-top:24px}
+  footer .wrap{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap}
+  footer p{font-size:12px;color:var(--grey-xlt);line-height:1.7;max-width:640px}
+
+  @media (max-width:760px){
+    .hero{padding:64px 0 48px}
+    .hero h1{font-size:36px}
+    .hero p{font-size:16px}
+    h2{font-size:26px}
+    .steps{flex-direction:column}
+    section{padding:48px 0}
+    .demo-stage{padding:28px 12px}
+    .card{padding:18px}
+    .tk{font-size:22px} .amt{font-size:18px}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap nav-inner">
+    <div class="logo">DoD<span>Screen</span></div>
+    <a class="nav-cta" href="#waitlist">Join the waitlist</a>
+  </div>
+</nav>
+
+<header class="hero wrap">
+  <h1>DoD contract alerts before the market moves.</h1>
+  <p>An AI system that monitors USASpending.gov 4x daily, cross-references 100+ publicly
+     traded defense companies, and delivers institutional-quality investment analysis to
+     your inbox before Wall Street notices.</p>
+  <a class="cta" href="#waitlist">Join the waitlist</a>
+  <div class="fine">Research alerts, not personalized investment advice.</div>
+</header>
+
+<section id="how">
+  <div class="wrap">
+    <div class="kicker">How it works</div>
+    <h2>From award to inbox in three steps</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="num">1</div>
+        <h3>Contract detected</h3>
+        <p>Our system monitors DoD contract awards throughout the day — same-day Pentagon
+           announcements and the USASpending.gov feed — and flags every award won by a
+           publicly traded company on our watchlist.</p>
+      </div>
+      <div class="step">
+        <div class="num">2</div>
+        <h3>AI analyzes</h3>
+        <p>Claude researches the company, checks SEC filings, insider buying, and price
+           action, weighs the award against the company's market cap, and writes a full
+           investment thesis.</p>
+      </div>
+      <div class="step">
+        <div class="num">3</div>
+        <h3>You get the edge</h3>
+        <p>An email arrives with a conviction tier, significance score, and a clear
+           act / watch / pass call — with the reasoning to back it up.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="demo">
+  <div class="wrap">
+    <div class="kicker">The product</div>
+    <h2>Every alert looks like this</h2>
+
+    <div class="demo-stage">
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="tk">RCAT</div>
+            <div class="co">Red Cat Holdings, Inc.</div>
+            <div class="px">$8.42 <b>+1.8%</b></div>
+          </div>
+          <div>
+            <div class="amt-label">CONTRACT</div>
+            <div class="amt">$15,000,000</div>
+            <span class="pill">WINDOW OPEN</span>
+          </div>
+        </div>
+
+        <div class="meta">Drones / Air Mobility · Army Contracting Command</div>
+
+        <div class="rule">
+          <span class="tier">Tier 2 · Medium conviction</span>
+        </div>
+
+        <div style="margin-top:18px">
+          <div class="sig-row"><span class="l">Significance</span><span class="r">6/10</span></div>
+          <div class="bar"><i></i></div>
+        </div>
+
+        <p class="thesis">A $15M production order against roughly $150M in guided annual
+        revenue is a meaningful book of business for Red Cat, and it extends the Army's
+        Short Range Reconnaissance program relationship that has driven the company's
+        prior award-day moves. The stock has not yet reacted, and insider buying over the
+        past month suggests conviction inside the building. The main risk is that this
+        order is a continuation of already-disclosed Tranche 2 volumes rather than new
+        demand.</p>
+
+        <table class="signals">
+          <tr><td class="l">Materiality</td><td class="r">0.93% of market cap</td></tr>
+          <tr><td class="l">30-day avg</td><td class="r">$8.15</td></tr>
+          <tr><td class="l">Recent 8-K</td><td class="r">None in 48h</td></tr>
+          <tr><td class="l">Insider buys</td><td class="r good">2 · Form 4, 30d</td></tr>
+          <tr><td class="l">Earnings</td><td class="r">None in 14d</td></tr>
+        </table>
+
+        <div class="rule watch">
+          <div class="l">Watch</div>
+          <p>A follow-on sole-source production award, or the next 10-Q showing this order
+             flowing into reported revenue and backlog.</p>
+        </div>
+      </div>
+    </div>
+    <div class="demo-caption">Illustrative sample using our live email format. Not a recommendation.</div>
+  </div>
+</section>
+
+<section id="waitlist" class="waitlist">
+  <div class="wrap">
+    <div class="kicker">Early access</div>
+    <h2>Get early access</h2>
+    <p class="sub">Be first in line when we open the daily digest. No spam — just the
+       launch email and your first alerts.</p>
+    <!-- TODO: replace YOUR_FORM_ID with your Formspree form ID (formspree.io → New Form) -->
+    <form action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+      <input type="email" name="email" required placeholder="you@example.com" aria-label="Email address">
+      <button type="submit">Join the waitlist</button>
+    </form>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p><strong style="color:#8a8a8a">DoDScreen</strong> · Sources: USASpending.gov, U.S. DoD contract
+       announcements, SEC EDGAR, Finnhub · Analysis by Claude</p>
+    <p>Not financial advice. For informational purposes only. Alerts are automated research,
+       not personalized recommendations. Verify all data before trading. Past results do not
+       guarantee future performance.</p>
+  </div>
+</footer>
+
+</body>
+</html>
